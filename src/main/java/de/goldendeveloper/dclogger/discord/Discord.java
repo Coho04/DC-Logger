@@ -15,7 +15,7 @@ public class Discord {
     public static String cmdHelp = "help";
     public static String cmdSettings = "settings";
     public static String cmdSubSettingsChannel = "channel";
-    public static String cmdSubSettingsChannelOptionChannel = "channelID";
+    public static String cmdSubSettingsChannelOptionChannel = "channelid";
 
     public Discord(String Token) {
         try {

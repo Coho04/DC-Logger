@@ -1,6 +1,7 @@
 package de.goldendeveloper.dclogger.discord;
 
 import de.goldendeveloper.dclogger.Main;
+import de.goldendeveloper.mysql.entities.Row;
 import de.goldendeveloper.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -48,7 +49,32 @@ public class Events extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
         if (e.isFromGuild()) {
-            onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getTextChannel());
+            if (e.getName().equalsIgnoreCase(Discord.cmdSettings)) {
+                if (e.getSubcommandName().equalsIgnoreCase(Discord.cmdSubSettingsChannel)) {
+                    TextChannel channel = e.getOption(Discord.cmdSubSettingsChannelOptionChannel).getAsTextChannel();
+                    if (channel != null) {
+                        if (Main.getMysql().existsDatabase(Main.dbName)) {
+                            if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
+                                Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
+                                if (table.hasColumn(Main.clmServerID)) {
+                                    if (table.getColumn(Main.clmServerID).getAll().contains(e.getGuild().getId())) {
+                                        HashMap<String, Object> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId());
+                                        table.getColumn(Main.clmChannelID).set(channel.getId(), Integer.parseInt(row.get("id").toString()));
+                                        e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
+                                    } else {
+                                        table.insert(new Row(table, table.getDatabase()).with(Main.clmChannelID, channel.getId()).with(Main.clmServerID, e.getGuild().getId()));
+                                        e.getInteraction().reply("Der Log Channel ist nun " + channel.getAsMention() + "!").queue();
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        e.getInteraction().reply("Der TextChannel konnte nicht gefunden werden!").queue();
+                    }
+                }
+            } else {
+                onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getTextChannel());
+            }
         }
     }
 
@@ -120,7 +146,7 @@ public class Events extends ListenerAdapter {
         builder.setTitle("**Logger**", "https://golden-developer.de");
         builder.setThumbnail(guild.getBannerUrl());
         builder.setAuthor("@Golden-Developer", "https://golden-developer.de");
-        builder.setTimestamp(LocalTime.now());
+//        builder.setTimestamp(LocalTime.now());
         builder.setColor(Color.gray);
         builder.addField("**" + Event + "**", Value, true);
         return builder.build();

@@ -11,17 +11,18 @@ public class Main {
     private static Discord discord;
     private static MYSQL mysql;
 
-    public static String dbName = "GD-Logger";
+    public static String dbName = "GDLogger";
     public static String tableName = "Discord";
     public static String clmServerID = "ServerID";
     public static String clmChannelID = "ChannelID";
 
     public static void main(String[] args) {
         discord = new Discord(ID.DiscordToken);
-        mysql = new MYSQL(ID.MysqlHostname, ID.MysqlUsername, ID.MysqlPassword, ID.MysqlPort);
+        connectMysql();
     }
 
     private static void connectMysql() {
+        mysql = new MYSQL(ID.MysqlHostname, ID.MysqlUsername, ID.MysqlPassword, ID.MysqlPort);
         if (!getMysql().existsDatabase(dbName)) {
             getMysql().createDatabase(dbName);
         }
@@ -36,6 +37,7 @@ public class Main {
         if (!table.hasColumn(clmChannelID)) {
             table.addColumn(clmChannelID, MysqlTypes.VARCHAR, 50);
         }
+        System.out.println("MYSQL Finished");
     }
 
     public static MYSQL getMysql() {
