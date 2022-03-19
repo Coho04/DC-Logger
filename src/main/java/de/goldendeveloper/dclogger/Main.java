@@ -5,6 +5,11 @@ import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.MysqlTypes;
 import de.goldendeveloper.mysql.entities.Table;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+
+import java.awt.*;
 
 public class Main {
 
@@ -49,6 +54,13 @@ public class Main {
     }
 
     public static void sendErrorMessage(String Error) {
-
+       TextChannel channel = getDiscord().getBot().getTextChannelById(ID.DiscordErrorChannel);
+       if (channel != null) {
+           MessageEmbed embed = new EmbedBuilder()
+                   .addField("[ERROR]",Error , true)
+                   .setColor(new Color(250, 0, 0))
+                   .build();
+           channel.sendMessageEmbeds(embed).queue();
+       }
     }
 }
