@@ -21,28 +21,39 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.time.LocalTime;
 import java.util.HashMap;
 
 public class Events extends ListenerAdapter {
 
     @Override
+    public void onMessageReceived(MessageReceivedEvent e) {
+        if (e.isFromGuild()) {
+            if (e.getMember() != null) {
+                if (e.getMember().getUser() != e.getJDA().getSelfUser()) {
+                    onEvent(e.getGuild(), "Message", "[Channel]: " + e.getTextChannel().getAsMention() + " \n Message: " + e.getMember().getUser().getAsMention() + " >> " + e.getMessage().getContentRaw(), e.getTextChannel());
+                }
+            }
+        }
+    }
+
+    @Override
     public void onMessageReactionAdd(MessageReactionAddEvent e) {
         if (e.isFromGuild()) {
-            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!",e.getTextChannel());
+            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!", e.getTextChannel());
         }
     }
 
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent e) {
         if (e.isFromGuild()) {
-            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!",e.getTextChannel());
+            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!", e.getTextChannel());
         }
     }
 
@@ -100,7 +111,7 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildUpdateAfkChannel(GuildUpdateAfkChannelEvent e) {
-        onEvent(e.getGuild(), "AFK Channel Update", "Der Neue AFK Channel ist nun " + e.getNewAfkChannel()  + " Alte: " + e.getOldAfkChannel(), null);
+        onEvent(e.getGuild(), "AFK Channel Update", "Der Neue AFK Channel ist nun " + e.getNewAfkChannel() + " Alte: " + e.getOldAfkChannel(), null);
     }
 
     @Override
@@ -110,7 +121,7 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
-        onEvent(e.getGuild(), "Nickname Update", "Der User " + e.getOldNickname() + " heißt nun " +  e.getNewNickname() + "!", null);
+        onEvent(e.getGuild(), "Nickname Update", "Der User " + e.getOldNickname() + " heißt nun " + e.getNewNickname() + "!", null);
     }
 
     @Override
@@ -132,10 +143,12 @@ public class Events extends ListenerAdapter {
     public void onGuildVoiceJoin(GuildVoiceJoinEvent e) {
         onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " gejoined!", null);
     }
+
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent e) {
         onEvent(e.getGuild(), "User Channel Leave", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen!", null);
     }
+
     @Override
     public void onGuildVoiceMove(GuildVoiceMoveEvent e) {
         onEvent(e.getGuild(), "User Channel Move", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen und ist dem Channel " + e.getChannelJoined() + " beigetreten!", null);
@@ -152,7 +165,7 @@ public class Events extends ListenerAdapter {
         return builder.build();
     }
 
-    private void onEvent(Guild guild, String Event, String Value,@Nullable TextChannel ch) {
+    private void onEvent(Guild guild, String Event, String Value, @Nullable TextChannel ch) {
         if (Main.getMysql().existsDatabase(Main.dbName)) {
             if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
                 Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
@@ -162,7 +175,7 @@ public class Events extends ListenerAdapter {
                         if (!row.get(Main.clmChannelID).toString().isEmpty()) {
                             TextChannel channel = guild.getTextChannelById(row.get(Main.clmChannelID).toString());
                             if (channel != null) {
-                                channel.sendMessageEmbeds(onEmbed(guild, Event,Value)).queue();
+                                channel.sendMessageEmbeds(onEmbed(guild, Event, Value)).queue();
                             }
                         } else {
                             if (ch != null) {
