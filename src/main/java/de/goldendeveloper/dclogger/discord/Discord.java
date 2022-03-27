@@ -1,5 +1,9 @@
 package de.goldendeveloper.dclogger.discord;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import de.goldendeveloper.dclogger.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -8,6 +12,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+
+import java.awt.*;
 
 public class Discord {
 
@@ -39,9 +45,20 @@ public class Discord {
                     new SubcommandData(cmdSubSettingsChannel, "Legt den Channel für die Nachrichten fest!")
                             .addOption(OptionType.CHANNEL,cmdSubSettingsChannelOptionChannel,"Legt den Channel für die Nachrichten fest!", true)
             ).queue();
+            Online();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void Online() {
+        WebhookClientBuilder builder = new WebhookClientBuilder("https://discord.com/api/webhooks/957737386165563482/9vo30g6HVlIj6C24r6Sjs-X-bADlKFbN1xwmaihn1PYzZLBcwFTt5QeLMG80JISu1vjM");
+        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor("DC-Logger", getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
+        embed.setColor(0x00FF00);
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", getBot().getSelfUser().getAvatarUrl()));
+        builder.build().send(embed.build());
     }
 
     public JDA getBot() {

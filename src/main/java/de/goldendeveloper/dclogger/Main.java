@@ -1,20 +1,19 @@
 package de.goldendeveloper.dclogger;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.dclogger.discord.Discord;
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.MysqlTypes;
 import de.goldendeveloper.mysql.entities.Table;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-
-import java.awt.*;
 
 public class Main {
 
     private static Discord discord;
     private static MYSQL mysql;
+    private static Config config;
 
     public static String dbName = "GDLogger";
     public static String tableName = "Discord";
@@ -22,12 +21,14 @@ public class Main {
     public static String clmChannelID = "ChannelID";
 
     public static void main(String[] args) {
-        discord = new Discord(ID.DiscordToken);
+        config = new Config();
+        discord = new Discord(config.getDiscordToken());
         connectMysql();
+        getDiscord().getBot().shutdown();
     }
 
     private static void connectMysql() {
-        mysql = new MYSQL(ID.MysqlHostname, ID.MysqlUsername, ID.MysqlPassword, ID.MysqlPort);
+        mysql = new MYSQL(config.getMysqlHostname(), config.getMysqlUsername(), config.getMysqlPassword(), config.getMysqlPort());
         if (!getMysql().existsDatabase(dbName)) {
             getMysql().createDatabase(dbName);
         }
@@ -54,13 +55,16 @@ public class Main {
     }
 
     public static void sendErrorMessage(String Error) {
-       TextChannel channel = getDiscord().getBot().getTextChannelById(ID.DiscordErrorChannel);
-       if (channel != null) {
-           MessageEmbed embed = new EmbedBuilder()
-                   .addField("[ERROR]",Error , true)
-                   .setColor(new Color(250, 0, 0))
-                   .build();
-           channel.sendMessageEmbeds(embed).queue();
-       }
+        WebhookClientBuilder builder = new WebhookClientBuilder("https://discord.com/api/webhooks/957737386165563482/9vo30g6HVlIj6C24r6Sjs-X-bADlKFbN1xwmaihn1PYzZLBcwFTt5QeLMG80JISu1vjM");
+        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor("DC-Logger", Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "[ERROR]", Error));
+        embed.setColor(0xFF0000);
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
+        builder.build().send(embed.build());
+    }
+
+    public static Config getConfig() {
+        return config;
     }
 }

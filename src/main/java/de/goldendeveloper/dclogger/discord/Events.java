@@ -1,5 +1,8 @@
 package de.goldendeveloper.dclogger.discord;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.dclogger.Main;
 import de.goldendeveloper.mysql.entities.Row;
 import de.goldendeveloper.mysql.entities.Table;
@@ -7,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -28,9 +32,21 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 public class Events extends ListenerAdapter {
+
+    @Override
+    public void onShutdown(ShutdownEvent e) {
+        WebhookClientBuilder builder = new WebhookClientBuilder("https://discord.com/api/webhooks/957737386165563482/9vo30g6HVlIj6C24r6Sjs-X-bADlKFbN1xwmaihn1PYzZLBcwFTt5QeLMG80JISu1vjM");
+        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor("DC-Logger", Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "OFFLINE"));
+        embed.setColor(0xFF0000);
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer",  Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
+        builder.build().send(embed.build());
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
@@ -156,10 +172,10 @@ public class Events extends ListenerAdapter {
 
     private MessageEmbed onEmbed(Guild guild, String Event, String Value) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("**Logger**", "https://golden-developer.de");
+        builder.setTitle("**Logger**", "https://Golden-Developer.de");
         builder.setThumbnail(guild.getBannerUrl());
-        builder.setAuthor("@Golden-Developer", "https://golden-developer.de");
-//        builder.setTimestamp(LocalTime.now());
+        builder.setAuthor("@Golden-Developer", "https://Golden-Developer.de");
+        builder.setTimestamp(LocalTime.now());
         builder.setColor(Color.gray);
         builder.addField("**" + Event + "**", Value, true);
         return builder.build();
