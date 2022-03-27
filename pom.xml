@@ -8,7 +8,7 @@
     <artifactId>DC-Logger</artifactId>
     <version>1.0</version>
 
-    <name>GD-Entertainment</name>
+    <name>GD-Logger</name>
     <build>
         <resources>
             <resource>
