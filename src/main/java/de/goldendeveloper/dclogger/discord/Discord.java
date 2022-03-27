@@ -40,8 +40,8 @@ public class Discord {
                     .addEventListeners(new Events())
                     .setAutoReconnect(true)
                     .build().awaitReady();
-            bot.upsertCommand(cmdHelp, "Zeigt dir eine Liste möglicher Befehle an!").queue();
-            bot.upsertCommand(cmdSettings, "Stellt den GD-Logger ein").addSubcommands(
+            getBot().upsertCommand(cmdHelp, "Zeigt dir eine Liste möglicher Befehle an!").queue();
+            getBot().upsertCommand(cmdSettings, "Stellt den GD-Logger ein").addSubcommands(
                     new SubcommandData(cmdSubSettingsChannel, "Legt den Channel für die Nachrichten fest!")
                             .addOption(OptionType.CHANNEL,cmdSubSettingsChannelOptionChannel,"Legt den Channel für die Nachrichten fest!", true)
             ).queue();

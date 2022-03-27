@@ -29,9 +29,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.LocalTime;
 import java.util.HashMap;
 
@@ -62,14 +65,18 @@ public class Events extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent e) {
         if (e.isFromGuild()) {
-            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!", e.getTextChannel());
+            if (e.getUser() != null) {
+                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!", e.getTextChannel());
+            }
         }
     }
 
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent e) {
         if (e.isFromGuild()) {
-            onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!", e.getTextChannel());
+            if (e.getUser() != null) {
+                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!", e.getTextChannel());
+            }
         }
     }
 
@@ -77,28 +84,47 @@ public class Events extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
         if (e.isFromGuild()) {
             if (e.getName().equalsIgnoreCase(Discord.cmdSettings)) {
-                if (e.getSubcommandName().equalsIgnoreCase(Discord.cmdSubSettingsChannel)) {
-                    TextChannel channel = e.getOption(Discord.cmdSubSettingsChannelOptionChannel).getAsTextChannel();
-                    if (channel != null) {
-                        if (Main.getMysql().existsDatabase(Main.dbName)) {
-                            if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
-                                Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
-                                if (table.hasColumn(Main.clmServerID)) {
-                                    if (table.getColumn(Main.clmServerID).getAll().contains(e.getGuild().getId())) {
-                                        HashMap<String, Object> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId());
-                                        table.getColumn(Main.clmChannelID).set(channel.getId(), Integer.parseInt(row.get("id").toString()));
-                                        e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
-                                    } else {
-                                        table.insert(new Row(table, table.getDatabase()).with(Main.clmChannelID, channel.getId()).with(Main.clmServerID, e.getGuild().getId()));
-                                        e.getInteraction().reply("Der Log Channel ist nun " + channel.getAsMention() + "!").queue();
+                if (e.getSubcommandName() != null) {
+                    if (e.getSubcommandName().equalsIgnoreCase(Discord.cmdSubSettingsChannel)) {
+                        OptionMapping option = e.getOption(Discord.cmdSubSettingsChannelOptionChannel);
+                        if (option != null) {
+                            TextChannel channel = option.getAsTextChannel();
+                            if (channel != null) {
+                                if (Main.getMysql().existsDatabase(Main.dbName)) {
+                                    if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
+                                        Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
+                                        if (table.hasColumn(Main.clmServerID)) {
+                                            if (e.getGuild() != null) {
+                                                if (table.getColumn(Main.clmServerID).getAll().contains(e.getGuild().getId())) {
+                                                    HashMap<String, Object> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId());
+                                                    table.getColumn(Main.clmChannelID).set(channel.getId(), Integer.parseInt(row.get("id").toString()));
+                                                    e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
+                                                } else {
+                                                    table.insert(new Row(table, table.getDatabase()).with(Main.clmChannelID, channel.getId()).with(Main.clmServerID, e.getGuild().getId()));
+                                                    e.getInteraction().reply("Der Log Channel ist nun " + channel.getAsMention() + "!").queue();
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                            } else {
+                                e.getInteraction().reply("Der TextChannel konnte nicht gefunden werden!").queue();
                             }
                         }
-                    } else {
-                        e.getInteraction().reply("Der TextChannel konnte nicht gefunden werden!").queue();
                     }
                 }
+            } else if (e.getName().equalsIgnoreCase(Discord.cmdHelp)) {
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.setTitle("**Help Commands**");
+                embed.setColor(Color.MAGENTA);
+                embed.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
+                for (Command cm : Main.getDiscord().getBot().retrieveCommands().complete()) {
+                    embed.addField("/" + cm.getName(), cm.getDescription(), true);
+                }
+                e.getInteraction().replyEmbeds(embed.build()).addActionRow(
+                        Button.link("https://wiki.golden-developer.de", "Online Übersicht"),
+                        Button.link("https://support.coho04.de", "Support Anfragen")
+                ).queue();
             } else {
                 onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getTextChannel());
             }
@@ -200,7 +226,7 @@ public class Events extends ListenerAdapter {
                         }
                     }
                 } else {
-                    Main.sendErrorMessage("Can not find Column ServerID");
+                    Main.sendErrorMessage("Can`t find Column ServerID");
                 }
             } else {
                 Main.sendErrorMessage("Table don´t exists");
