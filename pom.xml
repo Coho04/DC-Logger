@@ -5,15 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.goldendeveloper</groupId>
-    <artifactId>DC-Logger</artifactId>
+    <artifactId>GD-Logger</artifactId>
     <version>1.0</version>
 
     <name>GD-Logger</name>
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>login.xml</include>
+                    <include>ExampleLogin.xml</include>
+                </includes>
             </resource>
         </resources>
 
@@ -66,7 +70,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.goldendeveloper.entertainment.Main</mainClass>
+                            <mainClass>de.goldendeveloper.dclogger.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

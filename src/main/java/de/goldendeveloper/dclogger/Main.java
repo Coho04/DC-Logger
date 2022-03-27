@@ -24,7 +24,6 @@ public class Main {
         config = new Config();
         discord = new Discord(config.getDiscordToken());
         connectMysql();
-        getDiscord().getBot().shutdown();
     }
 
     private static void connectMysql() {
