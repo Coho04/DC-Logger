@@ -14,10 +14,6 @@
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>login.xml</include>
-                    <include>ExampleLogin.xml</include>
-                </includes>
             </resource>
         </resources>
 

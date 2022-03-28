@@ -5,5 +5,8 @@
         <Password>PASSWORD</Password>
         <Port>PORT</Port>
     </MYSQL>
-    <DiscordToken>DiscordToken</DiscordToken>
+    <Discord>
+        <Token>TOKEN</Token>
+        <Webhook>WEBHOOK</Webhook>
+    </Discord>
 </login>
