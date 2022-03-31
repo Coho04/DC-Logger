@@ -79,26 +79,6 @@ public class Config {
         }
     }
 
-    public void setDiscordToken(String discordToken) {
-        DiscordToken = discordToken;
-    }
-
-    public void setMysqlHostname(String mysqlHostname) {
-        MysqlHostname = mysqlHostname;
-    }
-
-    public void setMysqlPassword(String mysqlPassword) {
-        MysqlPassword = mysqlPassword;
-    }
-
-    public void setMysqlPort(int mysqlPort) {
-        MysqlPort = mysqlPort;
-    }
-
-    public void setMysqlUsername(String mysqlUsername) {
-        MysqlUsername = mysqlUsername;
-    }
-
     public String getDiscordWebhook() {
         return DiscordWebhook;
     }
