@@ -4,7 +4,8 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.dclogger.Main;
-import de.goldendeveloper.mysql.entities.Row;
+import de.goldendeveloper.mysql.entities.RowBuilder;
+import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -96,11 +97,11 @@ public class Events extends ListenerAdapter {
                                         if (table.hasColumn(Main.clmServerID)) {
                                             if (e.getGuild() != null) {
                                                 if (table.getColumn(Main.clmServerID).getAll().contains(e.getGuild().getId())) {
-                                                    HashMap<String, Object> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId());
-                                                    table.getColumn(Main.clmChannelID).set(channel.getId(), Integer.parseInt(row.get("id").toString()));
+                                                    HashMap<String, SearchResult> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId()).get();
+                                                    table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId()).set(table.getColumn(Main.clmChannelID),  row.get("id").getAsString());
                                                     e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
                                                 } else {
-                                                    table.insert(new Row(table, table.getDatabase()).with(Main.clmChannelID, channel.getId()).with(Main.clmServerID, e.getGuild().getId()));
+                                                    table.insert(new RowBuilder().with(table.getColumn(Main.clmChannelID), channel.getId()).with(table.getColumn(Main.clmServerID), e.getGuild().getId()).build());
                                                     e.getInteraction().reply("Der Log Channel ist nun " + channel.getAsMention() + "!").queue();
                                                 }
                                             }
@@ -213,9 +214,9 @@ public class Events extends ListenerAdapter {
                 Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
                 if (table.hasColumn(Main.clmServerID)) {
                     if (table.getColumn(Main.clmServerID).getAll().contains(guild.getId())) {
-                        HashMap<String, Object> row = table.getRow(table.getColumn(Main.clmServerID), guild.getId());
+                        HashMap<String, SearchResult> row = table.getRow(table.getColumn(Main.clmServerID), guild.getId()).get();
                         if (!row.get(Main.clmChannelID).toString().isEmpty()) {
-                            TextChannel channel = guild.getTextChannelById(row.get(Main.clmChannelID).toString());
+                            TextChannel channel = guild.getTextChannelById(row.get(Main.clmChannelID).getAsLong());
                             if (channel != null) {
                                 channel.sendMessageEmbeds(onEmbed(guild, Event, Value)).queue();
                             }
