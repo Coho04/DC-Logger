@@ -102,7 +102,7 @@
         <dependency>
             <groupId>com.github.golden-developer</groupId>
             <artifactId>MYSQL-Api</artifactId>
-            <version>3.0</version>
+            <version>3.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.9</version>
+            <version>5.0.0-alpha.12</version>
         </dependency>
     </dependencies>
 </project>

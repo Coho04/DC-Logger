@@ -4,6 +4,7 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.dclogger.Main;
+import de.goldendeveloper.dclogger.MysqlConnection;
 import de.goldendeveloper.mysql.entities.RowBuilder;
 import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -33,6 +35,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.awt.Color;
@@ -42,14 +45,16 @@ import java.util.HashMap;
 public class Events extends ListenerAdapter {
 
     @Override
-    public void onShutdown(ShutdownEvent e) {
+    public void onShutdown(@NotNull ShutdownEvent e) {
         WebhookClientBuilder builder = new WebhookClientBuilder(Main.getConfig().getDiscordWebhook());
         WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
-        embed.setAuthor(new WebhookEmbed.EmbedAuthor("DC-Logger", Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor(e.getJDA().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
         embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "OFFLINE"));
         embed.setColor(0xFF0000);
-        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer",  Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
-        builder.build().send(embed.build());
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
+        if (builder.build().send(embed.build()).isDone()) {
+            System.exit(0);
+        }
     }
 
     @Override
@@ -83,6 +88,8 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
+        User _Coho04_ = e.getJDA().getUserById("513306244371447828");
+        User zRazzer = e.getJDA().getUserById("428811057700536331");
         if (e.isFromGuild()) {
             if (e.getName().equalsIgnoreCase(Discord.cmdSettings)) {
                 if (e.getSubcommandName() != null) {
@@ -91,17 +98,17 @@ public class Events extends ListenerAdapter {
                         if (option != null) {
                             TextChannel channel = option.getAsTextChannel();
                             if (channel != null) {
-                                if (Main.getMysql().existsDatabase(Main.dbName)) {
-                                    if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
-                                        Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
-                                        if (table.hasColumn(Main.clmServerID)) {
+                                if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
+                                    if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
+                                        Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
+                                        if (table.hasColumn(MysqlConnection.clmServerID)) {
                                             if (e.getGuild() != null) {
-                                                if (table.getColumn(Main.clmServerID).getAll().contains(e.getGuild().getId())) {
-                                                    HashMap<String, SearchResult> row = table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId()).get();
-                                                    table.getRow(table.getColumn(Main.clmServerID), e.getGuild().getId()).set(table.getColumn(Main.clmChannelID),  row.get("id").getAsString());
+                                                if (table.getColumn(MysqlConnection.clmServerID).getAll().contains(e.getGuild().getId())) {
+                                                    HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).get();
+                                                    table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).set(table.getColumn(MysqlConnection.clmChannelID), row.get("id").getAsString());
                                                     e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
                                                 } else {
-                                                    table.insert(new RowBuilder().with(table.getColumn(Main.clmChannelID), channel.getId()).with(table.getColumn(Main.clmServerID), e.getGuild().getId()).build());
+                                                    table.insert(new RowBuilder().with(table.getColumn(MysqlConnection.clmChannelID), channel.getId()).with(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).build());
                                                     e.getInteraction().reply("Der Log Channel ist nun " + channel.getAsMention() + "!").queue();
                                                 }
                                             }
@@ -126,6 +133,26 @@ public class Events extends ListenerAdapter {
                         Button.link("https://wiki.golden-developer.de", "Online Übersicht"),
                         Button.link("https://support.coho04.de", "Support Anfragen")
                 ).queue();
+            } else if (e.getName().equalsIgnoreCase(Discord.cmdShutdown)) {
+                if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
+                    e.getInteraction().reply("Der Bot wird nun heruntergefahren").queue();
+                    e.getJDA().shutdown();
+                } else {
+                    e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot inhaber sein!").queue();
+                }
+            } else if (e.getName().equalsIgnoreCase(Discord.cmdRestart)) {
+                if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
+                    try {
+                        e.getInteraction().reply("Der Discord Bot wird nun neugestartet!").queue();
+                        Process p = Runtime.getRuntime().exec("screen -AmdS GD-Entertainment java -Xms1096M -Xmx1096M -jar GD-Entertainment-1.0.jar");
+                        p.waitFor();
+                        e.getJDA().shutdown();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot inhaber sein!").queue();
+                }
             } else {
                 onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getTextChannel());
             }
@@ -184,7 +211,7 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent e) {
-        onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " gejoined!", null);
+        onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " beigetreten!", null);
     }
 
     @Override
@@ -209,14 +236,14 @@ public class Events extends ListenerAdapter {
     }
 
     private void onEvent(Guild guild, String Event, String Value, @Nullable TextChannel ch) {
-        if (Main.getMysql().existsDatabase(Main.dbName)) {
-            if (Main.getMysql().getDatabase(Main.dbName).existsTable(Main.tableName)) {
-                Table table = Main.getMysql().getDatabase(Main.dbName).getTable(Main.tableName);
-                if (table.hasColumn(Main.clmServerID)) {
-                    if (table.getColumn(Main.clmServerID).getAll().contains(guild.getId())) {
-                        HashMap<String, SearchResult> row = table.getRow(table.getColumn(Main.clmServerID), guild.getId()).get();
-                        if (!row.get(Main.clmChannelID).toString().isEmpty()) {
-                            TextChannel channel = guild.getTextChannelById(row.get(Main.clmChannelID).getAsLong());
+        if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
+            if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
+                Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
+                if (table.hasColumn(MysqlConnection.clmServerID)) {
+                    if (table.getColumn(MysqlConnection.clmServerID).getAll().contains(guild.getId())) {
+                        HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).get();
+                        if (!row.get(MysqlConnection.clmChannelID).toString().isEmpty()) {
+                            TextChannel channel = guild.getTextChannelById(row.get(MysqlConnection.clmChannelID).getAsLong());
                             if (channel != null) {
                                 channel.sendMessageEmbeds(onEmbed(guild, Event, Value)).queue();
                             }
@@ -227,13 +254,13 @@ public class Events extends ListenerAdapter {
                         }
                     }
                 } else {
-                    Main.sendErrorMessage("Can`t find Column ServerID");
+                    Main.getDiscord().sendErrorMessage("Can`t find Column ServerID");
                 }
             } else {
-                Main.sendErrorMessage("Table don´t exists");
+                Main.getDiscord().sendErrorMessage("Table don´t exists");
             }
         } else {
-            Main.sendErrorMessage("Database don´t exists");
+            Main.getDiscord().sendErrorMessage("Database don´t exists");
         }
     }
 }

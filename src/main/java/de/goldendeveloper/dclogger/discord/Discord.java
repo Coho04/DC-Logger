@@ -14,6 +14,9 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.awt.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Properties;
 
 public class Discord {
 
@@ -21,7 +24,10 @@ public class Discord {
     public static String cmdHelp = "help";
     public static String cmdSettings = "settings";
     public static String cmdSubSettingsChannel = "channel";
-    public static String cmdSubSettingsChannelOptionChannel = "channelid";
+    public static String cmdSubSettingsChannelOptionChannel = "channel-id";
+
+    public static String cmdShutdown = "shutdown";
+    public static String cmdRestart = "restart";
 
     public Discord(String Token) {
         try {
@@ -40,25 +46,67 @@ public class Discord {
                     .addEventListeners(new Events())
                     .setAutoReconnect(true)
                     .build().awaitReady();
-            getBot().upsertCommand(cmdHelp, "Zeigt dir eine Liste möglicher Befehle an!").queue();
-            getBot().upsertCommand(cmdSettings, "Stellt den GD-Logger ein").addSubcommands(
-                    new SubcommandData(cmdSubSettingsChannel, "Legt den Channel für die Nachrichten fest!")
-                            .addOption(OptionType.CHANNEL,cmdSubSettingsChannelOptionChannel,"Legt den Channel für die Nachrichten fest!", true)
-            ).queue();
-            Online();
+            registerCommands();
+          if (!System.getProperty("os.name").split(" ")[0].equalsIgnoreCase("windows")) {
+              Online();
+          }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void registerCommands() {
+        bot.upsertCommand(cmdShutdown, "Fährt den Discord Bot herunter!").queue();
+        bot.upsertCommand(cmdRestart, "Startet den Discord Bot neu!").queue();
+        bot.upsertCommand(cmdHelp, "Zeigt dir eine Liste möglicher Befehle an!").queue();
+        bot.upsertCommand(cmdSettings, "Stellt den " + bot.getSelfUser().getName() + " ein").addSubcommands(
+                new SubcommandData(cmdSubSettingsChannel, "Legt den Channel für die Nachrichten fest!")
+                        .addOption(OptionType.CHANNEL,cmdSubSettingsChannelOptionChannel,"Legt den Channel für die Nachrichten fest!", true)
+        ).queue();
+    }
+
     private void Online() {
+        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor(getBot().getSelfUser().getName(), getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.setColor(0x00FF00);
+        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Gestartet als", bot.getSelfUser().getName()));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(bot.getGuilds().size())));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDFE2 Gestartet"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Version", getProjektVersion()));
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", getBot().getSelfUser().getAvatarUrl()));
+        embed.setTimestamp(new Date().toInstant());
+        new WebhookClientBuilder(Main.getConfig().getDiscordWebhook()).build().send(embed.build());
+    }
+
+    public void sendErrorMessage(String Error) {
         WebhookClientBuilder builder = new WebhookClientBuilder(Main.getConfig().getDiscordWebhook());
         WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
-        embed.setAuthor(new WebhookEmbed.EmbedAuthor("DC-Logger", getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
-        embed.setColor(0x00FF00);
-        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", getBot().getSelfUser().getAvatarUrl()));
+        embed.setAuthor(new WebhookEmbed.EmbedAuthor(Main.getDiscord().getBot().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "[ERROR]", Error));
+        embed.setColor(0xFF0000);
+        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
         builder.build().send(embed.build());
+    }
+
+    public String getProjektVersion() {
+        Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties.getProperty("version");
+    }
+
+    public String getProjektName() {
+        Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties.getProperty("name");
     }
 
     public JDA getBot() {
