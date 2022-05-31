@@ -40,20 +40,25 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.awt.Color;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Events extends ListenerAdapter {
 
     @Override
     public void onShutdown(@NotNull ShutdownEvent e) {
-        WebhookClientBuilder builder = new WebhookClientBuilder(Main.getConfig().getDiscordWebhook());
-        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
-        embed.setAuthor(new WebhookEmbed.EmbedAuthor(e.getJDA().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "OFFLINE"));
-        embed.setColor(0xFF0000);
-        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
-        if (builder.build().send(embed.build()).isDone()) {
-            System.exit(0);
+        if (Main.getDeployment()) {
+            WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+            embed.setAuthor(new WebhookEmbed.EmbedAuthor(Main.getDiscord().getBot().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Offline"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Gestoppt als", Main.getDiscord().getBot().getSelfUser().getName()));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(Main.getDiscord().getBot().getGuilds().size())));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDD34 Offline"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getDiscord().getProjektVersion()));
+            embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
+            embed.setTimestamp(new Date().toInstant());
+            embed.setColor(0xFF0000);
+            new WebhookClientBuilder(Main.getConfig().getDiscordWebhook()).build().send(embed.build()).thenRun(() -> System.exit(0));
         }
     }
 
@@ -143,8 +148,8 @@ public class Events extends ListenerAdapter {
             } else if (e.getName().equalsIgnoreCase(Discord.cmdRestart)) {
                 if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
                     try {
-                        e.getInteraction().reply("Der Discord Bot wird nun neugestartet!").queue();
-                        Process p = Runtime.getRuntime().exec("screen -AmdS GD-Entertainment java -Xms1096M -Xmx1096M -jar GD-Entertainment-1.0.jar");
+                        e.getInteraction().reply("Der Discord Bot [" + Main.getDiscord().getBot().getSelfUser().getName() + "] wird nun neugestartet!").queue();
+                        Process p = Runtime.getRuntime().exec("screen -AmdS " + Main.getDiscord().getProjektName() + " java -Xms1096M -Xmx1096M -jar " + Main.getDiscord().getProjektName() + "-" + Main.getDiscord().getProjektVersion() + ".jar restart");
                         p.waitFor();
                         e.getJDA().shutdown();
                     } catch (Exception ex) {
@@ -161,12 +166,12 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(GuildMemberRemoveEvent e) {
-        onEvent(e.getGuild(), "Server Verlassen", "Der User " + e.getUser().getName() + " hat den Server verlassen!", null);
+        onEvent(e.getGuild(), "Server verlassen", "Der User " + e.getUser().getName() + " hat den Server verlassen!", null);
     }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent e) {
-        onEvent(e.getGuild(), "Server join", "Der User " + e.getUser().getName() + " ist dem Server beigetreten!", null);
+        onEvent(e.getGuild(), "Server betreten", "Der User " + e.getUser().getName() + " ist dem Server beigetreten!", null);
     }
 
     @Override
@@ -243,7 +248,7 @@ public class Events extends ListenerAdapter {
                     if (table.getColumn(MysqlConnection.clmServerID).getAll().contains(guild.getId())) {
                         HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).get();
                         if (!row.get(MysqlConnection.clmChannelID).toString().isEmpty()) {
-                            TextChannel channel = guild.getTextChannelById(row.get(MysqlConnection.clmChannelID).getAsLong());
+                            TextChannel channel = guild.getTextChannelById(row.get(MysqlConnection.clmChannelID).getAsString());
                             if (channel != null) {
                                 channel.sendMessageEmbeds(onEmbed(guild, Event, Value)).queue();
                             }

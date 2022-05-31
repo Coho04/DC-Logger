@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
@@ -45,11 +44,12 @@ public class Discord {
                             GatewayIntent.GUILD_MESSAGE_TYPING)
                     .addEventListeners(new Events())
                     .setAutoReconnect(true)
+                    .setContextEnabled(true)
                     .build().awaitReady();
             registerCommands();
-          if (!System.getProperty("os.name").split(" ")[0].equalsIgnoreCase("windows")) {
-              Online();
-          }
+            if (Main.getDeployment()) {
+                Online();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,17 +59,22 @@ public class Discord {
         bot.upsertCommand(cmdShutdown, "Fährt den Discord Bot herunter!").queue();
         bot.upsertCommand(cmdRestart, "Startet den Discord Bot neu!").queue();
         bot.upsertCommand(cmdHelp, "Zeigt dir eine Liste möglicher Befehle an!").queue();
-        bot.upsertCommand(cmdSettings, "Stellt den " + bot.getSelfUser().getName() + " ein").addSubcommands(
+        bot.upsertCommand(cmdSettings, "Stellt den " + bot.getSelfUser().getName() + " ein!").addSubcommands(
                 new SubcommandData(cmdSubSettingsChannel, "Legt den Channel für die Nachrichten fest!")
-                        .addOption(OptionType.CHANNEL,cmdSubSettingsChannelOptionChannel,"Legt den Channel für die Nachrichten fest!", true)
+                        .addOption(OptionType.CHANNEL, cmdSubSettingsChannelOptionChannel, "Legt den Channel für die Nachrichten fest!", true)
         ).queue();
     }
 
     private void Online() {
         WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        if (Main.getRestart()) {
+            embed.setColor(0x33FFFF);
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Neustart erfolgreich"));
+        } else {
+            embed.setColor(0x00FF00);
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
+        }
         embed.setAuthor(new WebhookEmbed.EmbedAuthor(getBot().getSelfUser().getName(), getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
-        embed.setColor(0x00FF00);
-        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
         embed.addField(new WebhookEmbed.EmbedField(false, "Gestartet als", bot.getSelfUser().getName()));
         embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(bot.getGuilds().size())));
         embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDFE2 Gestartet"));

@@ -28,10 +28,6 @@ public class Config {
     }
 
     private void readXML(InputStream inputStream) {
-        this.MysqlHostname = "138.201.202.3";
-        this.MysqlUsername = "root";
-        this.MysqlPort = 3306;
-
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
