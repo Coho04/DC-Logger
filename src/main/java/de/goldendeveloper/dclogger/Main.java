@@ -18,7 +18,6 @@ public class Main {
         if (System.getProperty("os.name").split(" ")[0].equalsIgnoreCase("windows")) {
             deployment = false;
         }
-
         config = new Config();
         mysqlConnection = new MysqlConnection(config.getMysqlHostname(), config.getMysqlUsername(), config.getMysqlPassword(), config.getMysqlPort());
         discord = new Discord(config.getDiscordToken());
