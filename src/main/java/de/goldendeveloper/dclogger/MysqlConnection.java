@@ -2,7 +2,6 @@ package de.goldendeveloper.dclogger;
 
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
-import de.goldendeveloper.mysql.entities.MysqlTypes;
 import de.goldendeveloper.mysql.entities.Table;
 
 public class MysqlConnection {
@@ -25,10 +24,10 @@ public class MysqlConnection {
         }
         Table table = db.getTable(tableName);
         if (!table.hasColumn(clmServerID)) {
-            table.addColumn(clmServerID, MysqlTypes.VARCHAR, 50);
+            table.addColumn(clmServerID);
         }
         if (!table.hasColumn(clmChannelID)) {
-            table.addColumn(clmChannelID, MysqlTypes.VARCHAR, 50);
+            table.addColumn(clmChannelID);
         }
         System.out.println("MYSQL Finished");
     }

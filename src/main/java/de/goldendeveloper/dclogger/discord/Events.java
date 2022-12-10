@@ -10,7 +10,7 @@ import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.ShutdownEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
@@ -23,20 +23,19 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateAfkChannelEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateBannerEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateMaxMembersEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.awt.Color;
 import java.time.LocalTime;
 import java.util.Date;
@@ -76,7 +75,7 @@ public class Events extends ListenerAdapter {
         if (e.isFromGuild()) {
             if (e.getMember() != null) {
                 if (e.getMember().getUser() != e.getJDA().getSelfUser()) {
-                    onEvent(e.getGuild(), "Message", "[Channel]: " + e.getTextChannel().getAsMention() + " \n Message: " + e.getMember().getUser().getAsMention() + " >> " + e.getMessage().getContentRaw(), e.getTextChannel());
+                    onEvent(e.getGuild(), "Message", "[Channel]: " + e.getChannel().asTextChannel().getAsMention() + " \n Message: " + e.getMember().getUser().getAsMention() + " >> " + e.getMessage().getContentRaw(), e.getChannel().asTextChannel());
                 }
             }
         }
@@ -86,7 +85,7 @@ public class Events extends ListenerAdapter {
     public void onMessageReactionAdd(MessageReactionAddEvent e) {
         if (e.isFromGuild()) {
             if (e.getUser() != null) {
-                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!", e.getTextChannel());
+                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat mit " + e.getReaction().getEmoji().getAsReactionCode() + " auf die Nachricht " + e.getChannel().asTextChannel().getHistory().getMessageById(e.getMessageId()) + " reagiert!", e.getChannel().asTextChannel());
             }
         }
     }
@@ -95,7 +94,7 @@ public class Events extends ListenerAdapter {
     public void onMessageReactionRemove(MessageReactionRemoveEvent e) {
         if (e.isFromGuild()) {
             if (e.getUser() != null) {
-                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReactionEmote().getAsReactionCode() + " auf die Nachricht " + e.getTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!", e.getTextChannel());
+                onEvent(e.getGuild(), "Reaction", "Der User " + e.getUser().getName() + " hat seine Reaction " + e.getReaction().getEmoji().getAsReactionCode() + " auf die Nachricht " + e.getChannel().asTextChannel().getHistory().getMessageById(e.getMessageId()) + " entfernt!", e.getChannel().asTextChannel());
             }
         }
     }
@@ -110,14 +109,14 @@ public class Events extends ListenerAdapter {
                     if (e.getSubcommandName().equalsIgnoreCase(Discord.cmdSubSettingsChannel)) {
                         OptionMapping option = e.getOption(Discord.cmdSubSettingsChannelOptionChannel);
                         if (option != null) {
-                            TextChannel channel = option.getAsTextChannel();
+                            TextChannel channel = option.getAsChannel().asTextChannel();
                             if (channel != null) {
                                 if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
                                     if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
                                         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
                                         if (table.hasColumn(MysqlConnection.clmServerID)) {
                                             if (e.getGuild() != null) {
-                                                if (table.getColumn(MysqlConnection.clmServerID).getAll().contains(e.getGuild().getId())) {
+                                                if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(e.getGuild().getId())) {
                                                     HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).get();
                                                     table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).set(table.getColumn(MysqlConnection.clmChannelID), row.get("id").getAsString());
                                                     e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
@@ -168,7 +167,7 @@ public class Events extends ListenerAdapter {
                     e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot inhaber sein!").queue();
                 }
             } else {
-                onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getTextChannel());
+                onEvent(e.getGuild(), "Command", "Der User " + e.getUser().getName() + " hat den Command " + e.getName() + e.getSubcommandName(), e.getChannel().asTextChannel());
             }
         }
     }
@@ -224,17 +223,12 @@ public class Events extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildVoiceJoin(GuildVoiceJoinEvent e) {
+    public void onGuildVoiceUpdate(GuildVoiceUpdateEvent e) {
+        if (e.getOldValue() != null) {
+
+        }
         onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " beigetreten!", null);
-    }
-
-    @Override
-    public void onGuildVoiceLeave(GuildVoiceLeaveEvent e) {
         onEvent(e.getGuild(), "User Channel Leave", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen!", null);
-    }
-
-    @Override
-    public void onGuildVoiceMove(GuildVoiceMoveEvent e) {
         onEvent(e.getGuild(), "User Channel Move", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen und ist dem Channel " + e.getChannelJoined() + " beigetreten!", null);
     }
 
@@ -254,7 +248,7 @@ public class Events extends ListenerAdapter {
             if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
                 Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
                 if (table.hasColumn(MysqlConnection.clmServerID)) {
-                    if (table.getColumn(MysqlConnection.clmServerID).getAll().contains(guild.getId())) {
+                    if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(guild.getId())) {
                         HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).get();
                         if (!row.get(MysqlConnection.clmChannelID).toString().isEmpty()) {
                             TextChannel channel = guild.getTextChannelById(row.get(MysqlConnection.clmChannelID).getAsString());
