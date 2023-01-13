@@ -224,12 +224,17 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceUpdate(GuildVoiceUpdateEvent e) {
-        if (e.getOldValue() != null) {
-
+        if (e.getChannelLeft() != null && e.getChannelJoined() != null) {
+            onEvent(e.getGuild(), "User Channel Move", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen und ist dem Channel " + e.getChannelJoined() + " beigetreten!", null);
         }
-        onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " beigetreten!", null);
-        onEvent(e.getGuild(), "User Channel Leave", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen!", null);
-        onEvent(e.getGuild(), "User Channel Move", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen und ist dem Channel " + e.getChannelJoined() + " beigetreten!", null);
+
+        if (e.getChannelLeft() != null) {
+            onEvent(e.getGuild(), "User Channel Leave", "Der User " + e.getMember().getUser().getName() + " hat den Channel " + e.getChannelLeft().getAsMention() + " verlassen!", null);
+        }
+
+        if (e.getChannelJoined() != null) {
+            onEvent(e.getGuild(), "User Channel Join", "Der User " + e.getMember().getUser().getName() + " ist dem Channel " + e.getChannelJoined().getAsMention() + " beigetreten!", null);
+        }
     }
 
     private MessageEmbed onEmbed(Guild guild, String Event, String Value) {
