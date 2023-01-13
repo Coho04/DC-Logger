@@ -52,7 +52,7 @@ public class Events extends ListenerAdapter {
             embed.addField(new WebhookEmbed.EmbedField(false, "Gestoppt als", Main.getDiscord().getBot().getSelfUser().getName()));
             embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(Main.getDiscord().getBot().getGuilds().size())));
             embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDD34 Offline"));
-            embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getDiscord().getProjektVersion()));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getConfig().getProjektVersion()));
             embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
             embed.setTimestamp(new Date().toInstant());
             embed.setColor(0xFF0000);
@@ -157,7 +157,7 @@ public class Events extends ListenerAdapter {
                 if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
                     try {
                         e.getInteraction().reply("Der Discord Bot [" + Main.getDiscord().getBot().getSelfUser().getName() + "] wird nun neugestartet!").queue();
-                        Process p = Runtime.getRuntime().exec("screen -AmdS " + Main.getDiscord().getProjektName() + " java -Xms1096M -Xmx1096M -jar " + Main.getDiscord().getProjektName() + "-" + Main.getDiscord().getProjektVersion() + ".jar restart");
+                        Process p = Runtime.getRuntime().exec("screen -AmdS " + Main.getConfig().getProjektName() + " java -Xms1096M -Xmx1096M -jar " + Main.getConfig().getProjektName() + "-" + Main.getConfig().getProjektVersion() + ".jar restart");
                         p.waitFor();
                         e.getJDA().shutdown();
                     } catch (Exception ex) {
