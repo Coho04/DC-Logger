@@ -27,6 +27,9 @@ public class Config {
     private String MysqlPassword;
     private int MysqlPort;
 
+    private String ServerHostname;
+    private int ServerPort;
+
     public Config() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream local = classloader.getResourceAsStream("Login.xml");
@@ -87,6 +90,16 @@ public class Config {
                     }
                 }
             }
+
+            // Server
+            String hostname = doc.getElementsByTagName("Hostname").item(1).getTextContent();
+            String port = doc.getElementsByTagName("Port").item(1).getTextContent();
+            if (!hostname.isEmpty() || !hostname.isBlank()) {
+                this.ServerHostname = hostname;
+            }
+            if (!port.isEmpty() || !port.isBlank()) {
+                this.ServerPort = Integer.parseInt(port);
+            }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
@@ -134,5 +147,13 @@ public class Config {
             throw new RuntimeException(e);
         }
         return properties.getProperty("name");
+    }
+
+    public int getServerPort() {
+        return ServerPort;
+    }
+
+    public String getServerHostname() {
+        return ServerHostname;
     }
 }

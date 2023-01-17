@@ -62,11 +62,13 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(GuildJoinEvent e) {
+        Main.getServerCommunicator().addServer(e.getGuild().getId());
         e.getJDA().getPresence().setActivity(Activity.playing("/help | " + e.getJDA().getGuilds().size() + " Servern"));
     }
 
     @Override
     public void onGuildLeave(GuildLeaveEvent e) {
+        Main.getServerCommunicator().removeServer(e.getGuild().getId());
         e.getJDA().getPresence().setActivity(Activity.playing("/help | " + e.getJDA().getGuilds().size() + " Servern"));
     }
 
@@ -117,7 +119,7 @@ public class Events extends ListenerAdapter {
                                         if (table.hasColumn(MysqlConnection.clmServerID)) {
                                             if (e.getGuild() != null) {
                                                 if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(e.getGuild().getId())) {
-                                                    HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).get();
+                                                    HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).getData();
                                                     table.getRow(table.getColumn(MysqlConnection.clmServerID), e.getGuild().getId()).set(table.getColumn(MysqlConnection.clmChannelID), row.get("id").getAsString());
                                                     e.getInteraction().reply("Der neue Log Channel ist nun " + channel.getAsMention() + "!").queue();
                                                 } else {
@@ -144,7 +146,7 @@ public class Events extends ListenerAdapter {
                 }
                 e.getInteraction().replyEmbeds(embed.build()).addActionRow(
                         Button.link("https://wiki.golden-developer.de", "Online Übersicht"),
-                        Button.link("https://support.coho04.de", "Support Anfragen")
+                        Button.link("https://support.golden-developer.de", "Support Anfragen")
                 ).queue();
             } else if (e.getName().equalsIgnoreCase(Discord.cmdShutdown)) {
                 if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
@@ -254,7 +256,7 @@ public class Events extends ListenerAdapter {
                 Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
                 if (table.hasColumn(MysqlConnection.clmServerID)) {
                     if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(guild.getId())) {
-                        HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).get();
+                        HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).getData();
                         if (!row.get(MysqlConnection.clmChannelID).toString().isEmpty()) {
                             TextChannel channel = guild.getTextChannelById(row.get(MysqlConnection.clmChannelID).getAsString());
                             if (channel != null) {

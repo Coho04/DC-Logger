@@ -47,6 +47,7 @@ public class Discord {
                     .build().awaitReady();
             registerCommands();
             if (Main.getDeployment()) {
+                Main.getServerCommunicator().startBot(bot);
                 Online();
             }
             bot.getPresence().setActivity(Activity.playing("/help | " + bot.getGuilds().size() + " Servern"));
