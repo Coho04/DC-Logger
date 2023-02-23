@@ -97,7 +97,7 @@
         <dependency>
             <groupId>com.github.golden-developer</groupId>
             <artifactId>MYSQL-Api</artifactId>
-            <version>5.0</version>
+            <version>5.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -118,6 +118,11 @@
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>5.0.0-beta.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20220924</version>
         </dependency>
     </dependencies>
 </project>
