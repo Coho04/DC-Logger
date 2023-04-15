@@ -8,7 +8,7 @@ public class MysqlConnection {
 
     private final MYSQL mysql;
 
-    public static String dbName = "GDLogger";
+    public static String dbName = "GD-Logger";
     public static String tableName = "Discord";
     public static String clmServerID = "ServerID";
     public static String clmChannelID = "ChannelID";
