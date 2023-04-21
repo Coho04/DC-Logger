@@ -1,6 +1,9 @@
-package de.goldendeveloper.dclogger;
+package de.goldendeveloper.logger;
 
-import de.goldendeveloper.dclogger.discord.Discord;
+import de.goldendeveloper.logger.discord.Discord;
+import io.sentry.ITransaction;
+import io.sentry.Sentry;
+import io.sentry.SpanStatus;
 
 public class Main {
 
@@ -21,10 +24,34 @@ public class Main {
             deployment = false;
         }
         config = new Config();
-        serverCommunicator = new ServerCommunicator(Main.getConfig().getServerHostname(), Main.config.getServerPort());
+        Sentry(config.getSentryDNS());
+        ITransaction transaction = Sentry.startTransaction("Application()", "task");
+        try {
+            Application();
+        } catch (Exception e) {
+            transaction.setThrowable(e);
+            transaction.setStatus(SpanStatus.INTERNAL_ERROR);
+        } finally {
+            transaction.finish();
+        }
+    }
+
+    public static void Application() {
+        if (getDeployment()) {
+            serverCommunicator = new ServerCommunicator(config.getServerHostname(), config.getServerPort());
+        }
         mysqlConnection = new MysqlConnection(config.getMysqlHostname(), config.getMysqlUsername(), config.getMysqlPassword(), config.getMysqlPort());
         discord = new Discord(config.getDiscordToken());
     }
+
+    public static void Sentry(String dns) {
+        Sentry.init(options -> {
+            options.setDsn(dns);
+            options.setTracesSampleRate(1.0);
+            options.setEnvironment(Main.getDeployment() ? "Production" : "localhost");
+        });
+    }
+
 
     public static MysqlConnection getMysqlConnection() {
         return mysqlConnection;

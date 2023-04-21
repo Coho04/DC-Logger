@@ -1,4 +1,4 @@
-package de.goldendeveloper.dclogger;
+package de.goldendeveloper.logger;
 
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;

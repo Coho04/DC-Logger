@@ -1,9 +1,9 @@
-package de.goldendeveloper.dclogger.discord;
+package de.goldendeveloper.logger.discord;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
-import de.goldendeveloper.dclogger.Main;
+import de.goldendeveloper.logger.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;

@@ -1,10 +1,10 @@
-package de.goldendeveloper.dclogger.discord;
+package de.goldendeveloper.logger.discord;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
-import de.goldendeveloper.dclogger.Main;
-import de.goldendeveloper.dclogger.MysqlConnection;
+import de.goldendeveloper.logger.Main;
+import de.goldendeveloper.logger.MysqlConnection;
 import de.goldendeveloper.mysql.entities.RowBuilder;
 import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;

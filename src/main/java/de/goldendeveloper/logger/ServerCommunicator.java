@@ -1,4 +1,4 @@
-package de.goldendeveloper.dclogger;
+package de.goldendeveloper.logger;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
