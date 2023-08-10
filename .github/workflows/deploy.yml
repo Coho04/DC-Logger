@@ -1,14 +1,9 @@
 name: Deploy Java on Push/Pull Request
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-
+  create:
+    tags:
+      - '*'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
