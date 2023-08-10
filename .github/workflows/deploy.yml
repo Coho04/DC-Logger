@@ -1,4 +1,4 @@
-name: Deploy Java on Push/Pull Request
+name: Deploy Java on Tag
 
 on:
   create:
