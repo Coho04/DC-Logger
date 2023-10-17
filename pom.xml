@@ -7,8 +7,14 @@
     <groupId>de.goldendeveloper</groupId>
     <artifactId>GD-Logger</artifactId>
     <version>1.0</version>
-
     <name>GD-Logger</name>
+
+    <properties>
+        <java.version>20</java.version>
+        <project.source.encoding>UTF-8</project.source.encoding>
+        <project.target.encoding>UTF-8</project.target.encoding>
+    </properties>
+
     <build>
         <resources>
             <resource>
@@ -24,8 +30,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
 
@@ -80,11 +86,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
 
     <repositories>
         <repository>

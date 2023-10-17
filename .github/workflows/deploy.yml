@@ -1,28 +1,29 @@
-name: Deploy Java on Tag
+name: Deploy Java
 
 on:
-  create:
-    tags:
-      - '*'
+  push:
+    branches:
+      - main
+
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v4
       - name: Set up Java version
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: '18'
+          java-version: '20'
           distribution: 'temurin'
-
+          cache: maven
       - name: Build with Maven
         run: mvn clean install
-
-      - name: Deploy to FTP
-        if: github.event_name == 'push'
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+      - name: Build Jar
+        run: cd ${{ github.workspace }} && mvn install
+      - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.HOST }}
@@ -37,14 +38,13 @@ jobs:
             **/maven-archiver/**
             **/maven-status/**
 
-      - name: SSH into server and start
-        if: github.event_name == 'push'
+      - name: ls -a via ssh
         uses: fifsky/ssh-action@master
         with:
           command: |
             cd '${{ secrets.SERVER_DIR }}'
             ./start.sh
           host: ${{ secrets.HOST }}
-          port: 222
+          port: 22
           user: ${{ secrets.USERNAME }}
-          pass: ${{ secrets.PASSWORD }}
+          pass : ${{ secrets.PASSWORD }}
