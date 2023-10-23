@@ -89,10 +89,6 @@
 
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
             <id>golden-developer</id>
             <name>Golden-Developer</name>
             <url>https://nexus.golden-developer.de/repository/DCB-CORE/</url>
@@ -101,14 +97,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.golden-developer</groupId>
-            <artifactId>MYSQL-Api</artifactId>
-            <version>5.3</version>
-        </dependency>
-        <dependency>
             <groupId>de.goldendeveloper</groupId>
             <artifactId>DCB-Core</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
         </dependency>
     </dependencies>
 </project>
