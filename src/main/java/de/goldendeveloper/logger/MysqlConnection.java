@@ -3,6 +3,9 @@ package de.goldendeveloper.logger;
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.Table;
+import de.goldendeveloper.mysql.exceptions.NoConnectionException;
+
+import java.sql.SQLException;
 
 public class MysqlConnection {
 
@@ -13,7 +16,7 @@ public class MysqlConnection {
     public static String clmServerID = "ServerID";
     public static String clmChannelID = "ChannelID";
 
-    public MysqlConnection(String hostname, String username, String password, int port) {
+    public MysqlConnection(String hostname, String username, String password, int port) throws NoConnectionException, SQLException {
         mysql = new MYSQL(hostname, username, password, port);
         if (!mysql.existsDatabase(dbName)) {
             mysql.createDatabase(dbName);
