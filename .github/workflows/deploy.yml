@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Java version
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '20'
           distribution: 'temurin'
@@ -24,7 +24,7 @@ jobs:
       - name: Build Jar
         run: cd ${{ github.workspace }} && mvn install
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
