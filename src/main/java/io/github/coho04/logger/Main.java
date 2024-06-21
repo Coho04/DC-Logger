@@ -1,7 +1,7 @@
-package de.goldendeveloper.logger;
+package io.github.coho04.logger;
 
-import de.goldendeveloper.logger.discord.CustomEvents;
-import de.goldendeveloper.logger.discord.commands.Settings;
+import io.github.coho04.logger.discord.CustomEvents;
+import io.github.coho04.logger.discord.commands.Settings;
 import io.github.coho04.dcbcore.DCBotBuilder;
 
 

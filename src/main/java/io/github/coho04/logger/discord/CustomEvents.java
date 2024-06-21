@@ -1,7 +1,7 @@
-package de.goldendeveloper.logger.discord;
+package io.github.coho04.logger.discord;
 
-import de.goldendeveloper.logger.Main;
-import de.goldendeveloper.logger.MysqlConnection;
+import io.github.coho04.logger.Main;
+import io.github.coho04.logger.MysqlConnection;
 import io.github.coho04.mysql.entities.SearchResult;
 import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -127,9 +127,9 @@ public class CustomEvents extends ListenerAdapter {
 
     private MessageEmbed onEmbed(Guild guild, String event, String value) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("**Logger**", "https://Golden-Developer.de");
+        builder.setTitle("**Logger**");
         builder.setThumbnail(guild.getBannerUrl());
-        builder.setAuthor("@Golden-Developer", "https://Golden-Developer.de");
+        builder.setAuthor("@Logger");
         builder.setTimestamp(LocalTime.now());
         builder.setColor(Color.gray);
         builder.addField("**" + event + "**", value, true);

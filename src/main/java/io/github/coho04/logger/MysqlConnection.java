@@ -1,4 +1,4 @@
-package de.goldendeveloper.logger;
+package io.github.coho04.logger;
 
 
 import io.github.coho04.mysql.MYSQL;

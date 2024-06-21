@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.goldendeveloper</groupId>
-    <artifactId>GD-Logger</artifactId>
+    <groupId>io.github.coho04</groupId>
+    <artifactId>DC-Logger</artifactId>
     <version>1.0</version>
-    <name>GD-Logger</name>
+    <name>DC-Logger</name>
 
     <properties>
         <java.version>20</java.version>
@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.goldendeveloper.logger.Main</mainClass>
+                            <mainClass>io.github.coho04.logger.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
