@@ -1,9 +1,9 @@
 package de.goldendeveloper.logger.discord.commands;
 
-import de.goldendeveloper.dcbcore.DCBot;
-import de.goldendeveloper.dcbcore.interfaces.CommandInterface;
 import de.goldendeveloper.logger.Main;
 import de.goldendeveloper.logger.MysqlConnection;
+import io.github.coho04.dcbcore.DCBot;
+import io.github.coho04.dcbcore.interfaces.CommandInterface;
 import io.github.coho04.mysql.entities.RowBuilder;
 import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;

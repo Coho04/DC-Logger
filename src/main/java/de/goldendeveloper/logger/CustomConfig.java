@@ -1,6 +1,6 @@
 package de.goldendeveloper.logger;
 
-import de.goldendeveloper.dcbcore.Config;
+import io.github.coho04.dcbcore.Config;
 
 public class CustomConfig extends Config {
 

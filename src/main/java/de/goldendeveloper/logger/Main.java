@@ -1,8 +1,8 @@
 package de.goldendeveloper.logger;
 
-import de.goldendeveloper.dcbcore.DCBotBuilder;
 import de.goldendeveloper.logger.discord.CustomEvents;
 import de.goldendeveloper.logger.discord.commands.Settings;
+import io.github.coho04.dcbcore.DCBotBuilder;
 
 
 public class Main {
