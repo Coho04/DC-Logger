@@ -32,9 +32,9 @@ public class Settings implements CommandInterface {
     public void runSlashCommand(SlashCommandInteractionEvent e, DCBot dcBot) {
         if (e.getSubcommandName() != null && e.getSubcommandName().equalsIgnoreCase(cmdSubSettingsChannel)) {
             OptionMapping option = e.getOption(cmdSubSettingsChannelOptionChannel);
-            if (option != null && Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
-                if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
-                    Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
+            if (option != null && Main.getMysqlConnection().getMysql().existsDatabase(Main.getCustomConfig().getMysqlDatabase())) {
+                if (Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).existsTable(MysqlConnection.tableName)) {
+                    Table table = Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).getTable(MysqlConnection.tableName);
                     if (table.hasColumn(MysqlConnection.clmServerID) && e.getGuild() != null) {
                         TextChannel channel = option.getAsChannel().asTextChannel();
                         if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(e.getGuild().getId())) {

@@ -137,9 +137,9 @@ public class CustomEvents extends ListenerAdapter {
     }
 
     private void onEvent(Guild guild, String event, String value, @Nullable TextChannel textChannel) {
-        if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
-            if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.tableName)) {
-                Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.tableName);
+        if (Main.getMysqlConnection().getMysql().existsDatabase(Main.getCustomConfig().getMysqlDatabase())) {
+            if (Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).existsTable(MysqlConnection.tableName)) {
+                Table table = Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).getTable(MysqlConnection.tableName);
                 if (table.hasColumn(MysqlConnection.clmServerID)) {
                     if (table.getColumn(MysqlConnection.clmServerID).getAll().getAsString().contains(guild.getId())) {
                         HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmServerID), guild.getId()).getData();

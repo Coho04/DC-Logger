@@ -9,17 +9,16 @@ public class MysqlConnection {
 
     private final MYSQL mysql;
 
-    public static String dbName = "logger_db";
     public static String tableName = "Discord";
     public static String clmServerID = "ServerID";
     public static String clmChannelID = "ChannelID";
 
     public MysqlConnection(String hostname, String username, String password, int port) {
         mysql = new MYSQL(hostname, username, password, port);
-        if (!mysql.existsDatabase(dbName)) {
-            mysql.createDatabase(dbName);
+        if (!mysql.existsDatabase(Main.getCustomConfig().getMysqlDatabase())) {
+            mysql.createDatabase(Main.getCustomConfig().getMysqlDatabase());
         }
-        Database db = mysql.getDatabase(dbName);
+        Database db = mysql.getDatabase(Main.getCustomConfig().getMysqlDatabase());
         if (!db.existsTable(tableName)) {
             db.createTable(tableName);
         }
