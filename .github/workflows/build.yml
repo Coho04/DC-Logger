@@ -20,10 +20,3 @@ jobs:
           cache: maven
       - name: Build with Maven
         run: mvn clean install
-      - name: Get Maven Artifact ID
-        env:
-          VERSION:
-            mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec 2>/dev/null
-          ARTIFACT:
-            mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec 2>/dev/null
-        run: echo '${{ github.repository }}'
